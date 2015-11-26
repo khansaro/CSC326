@@ -1,0 +1,53 @@
+Public IP Address: 52.173.160.220 
+
+Benchmark Setup:ab -n 200 -c 14 http://54.173.160.220:8080/?keywords=computer
+
+Benchmark Results:
+This is ApacheBench, Version 2.3 <$Revision: 1528965 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 54.173.160.220 (be patient)
+Completed 100 requests
+Completed 200 requests
+Finished 200 requests
+
+
+Server Software:        WSGIServer/0.1
+Server Hostname:        54.173.160.220
+Server Port:            8080
+
+Document Path:          /?keywords=computer
+Document Length:        808 bytes
+
+Concurrency Level:      14
+Time taken for tests:   1.420 seconds
+Complete requests:      200
+Failed requests:        0
+Total transferred:      214800 bytes
+HTML transferred:       161600 bytes
+Requests per second:    140.81 [#/sec] (mean)
+Time per request:       99.424 [ms] (mean)
+Time per request:       7.102 [ms] (mean, across all concurrent requests)
+Transfer rate:          147.69 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        1    1   1.1      1       5
+Processing:     4   68 255.6     20    1415
+Waiting:        4   68 255.6     20    1415
+Total:          7   69 256.3     21    1420
+
+Percentage of the requests served within a certain time (ms)
+  50%     21
+  66%     21
+  75%     21
+  80%     22
+  90%     23
+  95%     26
+  98%   1412
+  99%   1417
+ 100%   1420 (longest request)
+
+Ths difference between the Lab2 and Lab3 results is that in Lab2, the number of concurrent connections could go upto 15 while now it can only go upto 14. This difference in performance is due to the addition of the database retrieval in Lab3(persistant storage) which takes more time than it took in Lab2 where it wasn't required to access a database.
+
