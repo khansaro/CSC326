@@ -1,1 +1,1 @@
-# CSC326
+# CSC326 Labs
