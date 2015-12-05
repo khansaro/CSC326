@@ -1,5 +1,8 @@
 import boto.ec2
+import subprocess as proc
+import time
 
+key_pair_name = "newkey1"
 #open access key file
 with open ("credentials.csv", "r") as myfile:
     data=myfile.readlines()
@@ -12,26 +15,40 @@ conn = boto.ec2.connect_to_region("us-east-1",
        aws_access_key_id = access_key[1].replace('/r/n',''),
        aws_secret_access_key = access_key[2].replace('/r/n','').split()[0])
        
-#conn.delete_key_pair('newkey')       
+#conn.delete_key_pair(key_pair)       
 
 #create key value pair
-key_pair = conn.create_key_pair('newkey')
+try:
+    key_pair = conn.create_key_pair(key_pair_name)
+    key_pair.save('.')
+except Exception as e:
+    print e
 #save it
-key_pair.save('.')
 
 #conn.delete_security_group('regular')
 
 #create security group
-sec_group = conn.create_security_group('csc326-group23', 'CSC326 Security Group')
-
+try:
+    sec_group = conn.create_security_group('csc326-group23_test', 'CSC326 Security Group Test')
+    print sec_group
+except Exception as e:
+    rs = conn.get_all_security_groups()
+    for i in rs:
+        if i.name == 'csc326-group23_test':
+            sec_group = i
+    print e
 #access existing sec group
-rs = conn.get_all_security_groups()
-sec_group = rs[1]
+#rs = conn.get_all_security_groups()
+#sec_group = rs[1]
 
 #setup protocols
-sec_group.authorize('icmp', -1, -1, '0.0.0.0/0')
-sec_group.authorize('tcp', 22, 22, '0.0.0.0/0')
-sec_group.authorize('tcp', 80, 80, '0.0.0.0/0')
+try: 
+    sec_group.authorize('icmp', -1, -1, '0.0.0.0/0')
+    sec_group.authorize('tcp', 22, 22, '0.0.0.0/0')
+    sec_group.authorize('tcp', 80, 80, '0.0.0.0/0')
+    sec_group.authorize('tcp', '8080', '8080', '0.0.0.0/0')
+except Exception as e:
+    print e
 
 #access existing instances
 #instances = conn.get_only_instances()
@@ -40,12 +57,17 @@ sec_group.authorize('tcp', 80, 80, '0.0.0.0/0')
 #    list_i.append(i.id)
 
 #create new instance
-instance = conn.run_instances('ami-8caa1ce4', 
-                   key_name='newkey', 
-		   instance_type='t1.micro',
-		   security_groups=['regular'])
-
+reservation = conn.run_instances('ami-8caa1ce4', 
+                                key_name=key_pair_name, 
+                                instance_type='t1.micro',
+                                security_groups=[sec_group.name])
+           
 #terminate instances given list of instance_id
 #conn.terminate_instances(instance_ids=list_i)
 
+instance = reservation.instances[0]
 
+while instance.update() != "rsunning":
+    time.sleep(5)
+
+proc.call("scp -i %s.pem -o StrictHostKeyChecking=no -r Lab3-front/ ubuntu@%s:~/" % (key_pair_name, instance.ip_address), shell=True)
