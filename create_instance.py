@@ -67,7 +67,11 @@ reservation = conn.run_instances('ami-8caa1ce4',
 
 instance = reservation.instances[0]
 
-while instance.update() != "rsunning":
+while instance.update() != "running":
     time.sleep(5)
 
+time.sleep(60)
 proc.call("scp -i %s.pem -o StrictHostKeyChecking=no -r Lab3-front/ ubuntu@%s:~/" % (key_pair_name, instance.ip_address), shell=True)
+proc.Popen(("ssh -i %s.pem ubuntu@%s sudo /bin/bash ~/Lab3-front/install_script.sh" % (key_pair_name, instance.ip_address)).split())
+
+print ("Server is running on %s:8080" % instance.ip_address)
