@@ -2,3 +2,8 @@ Lab3-front/data
 *.pem
 *.pyc
 *~
+credentials.csv
+.nfs00000000002971240000027c
+Lab3-front/bottle-0.12.7/build/
+numpy-1.10.1/
+
