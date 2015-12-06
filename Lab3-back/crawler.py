@@ -202,6 +202,12 @@ class crawler(object):
         word_id = self._insert_word(word)
         self._word_id_cache[word] = word_id
         return word_id
+
+    def get_word(self, word_id):
+        """Get the word given a word id"""
+        for id in self._word_dict.keys():
+            if (id == word_id):
+                return self._word_dict[id][0]
     
     def document_id(self, url):
         """Get the document id for some url."""
@@ -256,7 +262,15 @@ class crawler(object):
         # TODO: knowing self._curr_doc_id and the list of all words and their
         #       font sizes (in self._curr_words), add all the words into the database for this document
         self._doc_dict[self._curr_doc_id].append(len(self._curr_words))
-        
+        temp = ""
+        num_words = 0
+        for i,j in self._curr_words:
+            if num_words > 20:
+                break
+            temp = temp + " " + self.get_word(i)
+            num_words += 1
+        self._doc_dict[self._curr_doc_id].append(temp)
+ 
     def _increase_font_factor(self, factor):
         """Increade/decrease the current font size."""
         def increase_it(elem):
@@ -439,4 +453,5 @@ if __name__ == "__main__":
     #con = lite.connect("dbFile.db")
     bot = crawler(None, "urls.txt")
     bot.crawl(depth=1)
+    print bot.get_doc_dict()
     #con.close()
